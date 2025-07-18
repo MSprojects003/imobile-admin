@@ -711,26 +711,26 @@ const EditProduct: React.FC<EditProductProps> = ({ open, productId, onClose }) =
                 </div>
               </div>
             </>)}
+            <SheetFooter className="flex justify-end space-x-3 pt-2 pb-0">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="border-gray-300 text-gray-700 hover:bg-gray-100 rounded-md"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={updateMutation.isPending}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md"
+              >
+                {updateMutation.isPending ? 'Updating...' : 'Save Changes'}
+              </Button>
+            </SheetFooter>
           </form>
           )}
         </div>
-        <SheetFooter className="flex justify-end space-x-3 pt-2 pb-0">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            className="border-gray-300 text-gray-700 hover:bg-gray-100 rounded-md"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={updateMutation.isPending}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md"
-          >
-            {updateMutation.isPending ? 'Updating...' : 'Save Changes'}
-          </Button>
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   );

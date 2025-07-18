@@ -449,30 +449,30 @@ const AddProducts = ({ onAddProduct }: { onAddProduct: (product: Product) => voi
                   <div className="text-sm text-gray-600 mt-1">Selected: {backImage.name}</div>
                 )}
               </div>
+              <SheetFooter className="flex justify-end space-x-3 pt-2 pb-0">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    reset();
+                    setFrontImage(null);
+                    setBackImage(null);
+                    setIsSheetOpen(false);
+                  }}
+                  className="border-gray-300 text-gray-700 hover:bg-gray-100 rounded-md"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md"
+                  disabled={mutation.status === 'pending'}
+                >
+                  {mutation.status === 'pending' ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </SheetFooter>
             </form>
           </div>
-          <SheetFooter className="flex justify-end space-x-3 pt-2 pb-0">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                reset();
-                setFrontImage(null);
-                setBackImage(null);
-                setIsSheetOpen(false);
-              }}
-              className="border-gray-300 text-gray-700 hover:bg-gray-100 rounded-md"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md"
-              disabled={mutation.status === 'pending'}
-            >
-              {mutation.status === 'pending' ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </SheetFooter>
         </SheetContent>
       </Sheet>
     </>
