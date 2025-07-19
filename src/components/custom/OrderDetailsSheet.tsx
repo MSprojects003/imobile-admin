@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { MoreHorizontal } from 'lucide-react';
 import ProductItemSheet from './ProductItemSheet';
-import { acceptOrder } from '@/lib/db/orders';
+import { acceptOrder, cancelOrder } from '@/lib/db/orders';
 import Image from 'next/image';
 
 interface Product {
@@ -68,6 +68,8 @@ export default function OrderDetailsSheet({
   const [isProductSheetOpen, setIsProductSheetOpen] = useState(false);
   const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
   const [trackIdInput, setTrackIdInput] = useState('');
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [isCanceled, setIsCanceled] = useState(order?.status === false && order?.track_id === null);
   
   const queryClient = useQueryClient();
   
@@ -84,6 +86,18 @@ export default function OrderDetailsSheet({
     }
   });
 
+  const cancelOrderMutation = useMutation({
+    mutationFn: ({ orderId }: { orderId: string }) => cancelOrder(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      setCancelDialogOpen(false);
+      setIsCanceled(true);
+    },
+    onError: (error) => {
+      console.error('Error canceling order:', error);
+    }
+  });
+
   const handleAcceptOrder = useCallback(() => {
     if (order && trackIdInput.trim()) {
       acceptOrderMutation.mutate({
@@ -92,6 +106,12 @@ export default function OrderDetailsSheet({
       });
     }
   }, [order, trackIdInput, acceptOrderMutation]);
+
+  const handleCancelOrder = useCallback(() => {
+    if (order) {
+      cancelOrderMutation.mutate({ orderId: order.id });
+    }
+  }, [order, cancelOrderMutation]);
 
   const handleViewProductDetails = useCallback((item: OrderItem) => {
     setSelectedProductItem(item);
@@ -106,6 +126,10 @@ export default function OrderDetailsSheet({
   const handleCloseAcceptDialog = useCallback(() => {
     setAcceptDialogOpen(false);
     setTrackIdInput('');
+  }, []);
+
+  const handleCloseCancelDialog = useCallback(() => {
+    setCancelDialogOpen(false);
   }, []);
 
   if (!order) return null;
@@ -302,15 +326,29 @@ export default function OrderDetailsSheet({
               </CardContent>
             </Card>
 
-            {/* Accept Order Button */}
-            <div className="flex justify-center pt-6">
-              <Button 
-                onClick={() => setAcceptDialogOpen(true)}
-                disabled={order.status}
-                className="w-full max-w-xs"
-              >
-                {order.status ? 'Order Already Accepted' : 'Accept Order'}
-              </Button>
+            {/* Accept/Cancel Order Buttons or Status */}
+            <div className="flex flex-col items-center pt-6">
+              {isCanceled || (order.status === false && order.track_id === null) ? (
+                <Badge variant="destructive" className="w-full max-w-xs text-center">Canceled!</Badge>
+              ) : order.status ? (
+                <Button disabled className="w-full max-w-xs">Order Already Accepted</Button>
+              ) : (
+                <div className="flex gap-2 w-full max-w-xs">
+                  <Button 
+                    onClick={() => setAcceptDialogOpen(true)}
+                    className="flex-1"
+                  >
+                    Accept Order
+                  </Button>
+                  <Button 
+                    variant="destructive"
+                    onClick={() => setCancelDialogOpen(true)}
+                    className="flex-1"
+                  >
+                    Cancel Order
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </SheetContent>
@@ -357,6 +395,34 @@ export default function OrderDetailsSheet({
               disabled={!trackIdInput.trim() || acceptOrderMutation.isPending}
             >
               {acceptOrderMutation.isPending ? 'Accepting...' : 'Add'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Order Dialog */}
+      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Cancel Order</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <p className="text-sm text-gray-700">Are you sure you want to cancel this order? This action cannot be undone.</p>
+          </div>
+          <DialogFooter className="flex justify-end gap-2 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={handleCloseCancelDialog}
+              disabled={cancelOrderMutation.isPending}
+            >
+              No, Go Back
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleCancelOrder}
+              disabled={cancelOrderMutation.isPending}
+            >
+              {cancelOrderMutation.isPending ? 'Canceling...' : 'Yes, Cancel Order'}
             </Button>
           </DialogFooter>
         </DialogContent>

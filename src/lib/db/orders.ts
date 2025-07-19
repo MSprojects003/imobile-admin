@@ -44,3 +44,19 @@ export async function getAllorders() {
     return data;
   }
 
+  export async function cancelOrder(order_id: string) {
+    const { data, error } = await supabase
+      .from('orders')
+      .update({ 
+        status: false, 
+        track_id: '', // set to empty string instead of null
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', order_id)
+      .eq('is_deleted', false)
+      .select();
+
+    if (error) throw error;
+    return data;
+  }
+

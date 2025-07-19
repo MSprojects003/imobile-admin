@@ -14,7 +14,7 @@ const PAGE_SIZE = 10;
 
 export default function OrdersPage() {
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<'All' | 'Completed' | 'Pending'>('All');
+  const [filter, setFilter] = useState<'All' | 'Completed' | 'Pending' | 'Cancelled'>('All');
   const [page, setPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isOrderDetailsOpen, setIsOrderDetailsOpen] = useState(false);
@@ -31,7 +31,8 @@ export default function OrdersPage() {
     if (filter !== 'All') {
       data = data.filter(order => {
         if (filter === 'Completed') return order.status === true;
-        if (filter === 'Pending') return order.status === false;
+        if (filter === 'Pending') return order.status === false && order.track_id !== '';
+        if (filter === 'Cancelled') return order.track_id === '';
         return true;
       });
     }
@@ -141,6 +142,13 @@ export default function OrdersPage() {
             >
               Pending
             </Button>
+            <Button
+              variant={filter === 'Cancelled' ? 'default' : 'outline'}
+              onClick={() => { setFilter('Cancelled'); setPage(1); }}
+              size="sm"
+            >
+              Cancelled
+            </Button>
           </div>
         </div>
       </div>
@@ -190,13 +198,19 @@ export default function OrdersPage() {
                       {formatCurrency(order.total_amount)}
                     </TableCell>
                     <TableCell>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        order.status === true 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {order.status === true ? 'Completed' : 'Pending'}
-                      </span>
+                      {order.track_id === '' ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          Cancelled
+                        </span>
+                      ) : order.status === true ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Completed
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                          Pending
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
