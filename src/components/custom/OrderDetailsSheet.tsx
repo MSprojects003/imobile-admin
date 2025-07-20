@@ -76,10 +76,16 @@ export default function OrderDetailsSheet({
   const acceptOrderMutation = useMutation({
     mutationFn: ({ orderId, trackId }: { orderId: string; trackId: string }) => 
       acceptOrder(orderId, trackId),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // data.updatedProducts is an array of { product_id, quantity }
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       setAcceptDialogOpen(false);
       setTrackIdInput('');
+      // Optionally, log or display updated product quantities
+      if (data && data.updatedProducts) {
+        console.log('Updated product quantities:', data.updatedProducts);
+        // You can display a toast or update UI here if needed
+      }
     },
     onError: (error) => {
       console.error('Error accepting order:', error);

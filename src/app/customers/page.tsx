@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {   Trash2, Edit, Eye, SquareArrowRightIcon  } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -25,12 +24,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,6 +46,8 @@ interface Customer {
   address: string;
   created_date: string;
   is_deleted: boolean;
+  full_name?: string;
+  city?: string;
 }
 
 const ITEMS_PER_PAGE = 4;
@@ -89,35 +84,6 @@ export default function CustomersPage() {
 
   const truncateText = (text: string, maxLength: number) => {
     return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
-  };
-
-  const handleDeleteClick = (customer: Customer) => {
-    setSelectedCustomer(customer);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!selectedCustomer) return;
-    
-    try {
-      // You can implement soft delete for customers here
-      // await softDeleteCustomer(selectedCustomer.id);
-      setDeleteDialogOpen(false);
-      setSelectedCustomer(null);
-      refetch();
-    } catch (error) {
-      console.error('Error deleting customer:', error);
-    }
-  };
-
-  const handleEditClick = (customer: Customer) => {
-    // You can implement edit customer functionality here
-    console.log('Edit customer:', customer);
-  };
-
-  const handleViewClick = (customer: Customer) => {
-    // You can implement view customer details functionality here
-    console.log('View customer:', customer);
   };
 
   // Skeleton row component
@@ -163,11 +129,7 @@ export default function CustomersPage() {
               className="max-w-md w-full"
             />
           </div>
-          <div className="flex space-x-3">
-            <Button variant="outline" className="border-gray-300">
-              Export
-            </Button>
-          </div>
+           
         </div>
       </div>
 
@@ -178,10 +140,10 @@ export default function CustomersPage() {
             <TableHeader className="bg-gray-50 sticky top-0">
               <TableRow>
                 <TableHead className="w-[250px]">Customer</TableHead>
+                <TableHead className="w-[200px]">City</TableHead>
                 <TableHead className="w-[300px]">Email</TableHead>
                 <TableHead className="w-[200px]">Phone</TableHead>
                 <TableHead>Address</TableHead>
-                <TableHead className="text-right w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -197,17 +159,22 @@ export default function CustomersPage() {
                       <div className="flex items-center space-x-3">
                         <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                           <span className="text-blue-600 font-semibold text-sm">
-                            {customer.email.charAt(0).toUpperCase()}
+                            {customer.full_name ? customer.full_name.charAt(0).toUpperCase() : customer.email.charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div>
                           <div className="text-sm font-medium text-gray-900">
-                            {customer.email}
+                            {customer.full_name || customer.email || customer.id}
                           </div>
                           <div className="text-xs text-gray-500">
                             ID: {customer.id.slice(0, 8)}...
                           </div>
                         </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm text-gray-900">
+                        {customer.city || '--'}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -234,32 +201,6 @@ export default function CustomersPage() {
                         </Tooltip>
                       </TooltipProvider>
                     </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <SquareArrowRightIcon className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem className="flex items-center gap-2" onClick={() => handleViewClick(customer)}>
-                            <Eye className="h-4 w-4" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="flex items-center gap-2" onClick={() => handleEditClick(customer)}>
-                            <Edit className="h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className="flex items-center gap-2 text-red-600 focus:text-red-600"
-                            onClick={() => handleDeleteClick(customer)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
                   </TableRow>
                 ))
               )}
@@ -283,7 +224,13 @@ export default function CustomersPage() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction 
               className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
-              onClick={handleConfirmDelete}
+              onClick={() => {
+                // Placeholder for actual deletion logic
+                console.log('Deleting customer:', selectedCustomer);
+                setDeleteDialogOpen(false);
+                setSelectedCustomer(null);
+                refetch();
+              }}
             >
               Delete
             </AlertDialogAction>
