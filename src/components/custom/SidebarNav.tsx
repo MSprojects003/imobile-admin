@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Package, ShoppingBag, User, Users, LogOut, Tag, Image, Monitor } from 'lucide-react';
+import { Package, ShoppingBag, User, Users, LogOut, Tag, Monitor } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
   Sidebar,
@@ -15,6 +15,8 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
+import logo from "../../app/logo.png"
 
 // Define the navigation link interface
 interface NavLink {
@@ -47,6 +49,7 @@ const SidebarNav = () => {
       {/* Header with Logo */}
       <SidebarHeader className="p-4 border-b border-slate-200">
         <h2 className="text-2xl font-bold text-slate-800">Logo</h2>
+        <Image src={logo} width={100} height={100} alt='logo' />
       </SidebarHeader>
 
       {/* Content with Navigation Links */}
