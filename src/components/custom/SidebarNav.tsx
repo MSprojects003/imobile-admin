@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Package, ShoppingBag, User, Users, LogOut, Tag, Monitor } from 'lucide-react';
+import { Package, ShoppingBag, User, Users, LogOut, Tag,ImagePlus, Monitor } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
   Sidebar,
@@ -34,7 +34,7 @@ const SidebarNav = () => {
     { title: 'Profile', url: '/profile', icon: User },
     { title: 'Customers', url: '/customers', icon: Users },
     { title: 'Offers', url: '/offers', icon: Tag, comingSoon: true },
-    { title: 'Banner', url: '/banner', icon: Image },
+    { title: 'Banner', url: '/banner', icon: ImagePlus },
     { title: 'Hero', url: '/hero', icon: Monitor, comingSoon: true },
   ];
 
@@ -48,7 +48,7 @@ const SidebarNav = () => {
     <Sidebar>
       {/* Header with Logo */}
       <SidebarHeader className="p-4 border-b border-slate-200">
-        <h2 className="text-2xl font-bold text-slate-800">Logo</h2>
+        
         <Image src={logo} width={100} height={100} alt='logo' />
       </SidebarHeader>
 
